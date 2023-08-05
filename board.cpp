@@ -1,12 +1,14 @@
 #include "board.hpp"
 
-Board::Board(int dimension) : size(dimension), randomEngine(std::random_device{}()) {
+Board::Board(int dimension) : size(dimension), destroyed(false), randomEngine(std::random_device{}()) {
     tiles.resize(dimension * dimension);
 }
 
-int Board::GetSize() { return size; }
+int Board::GetSize() const { return size; }
 
-void Board::Separator()
+bool Board::GetState() const { return destroyed; }
+
+void Board::Separator() const
 {
     std::cout << "+";
     for (int j = 0; j < size; ++j) {
@@ -15,7 +17,7 @@ void Board::Separator()
     std::cout << std::endl;
 }
 
-void Board::Display() {
+void Board::Display() const {
     Separator();
 
     for (int i = 0; i < size; ++i) {
@@ -49,14 +51,15 @@ void Board::Display() {
     Separator();
 }
 
-void Board::PlaceMines(int playerSelectedIndex) {
+void Board::PlaceMines(int& playerSelectedIndex) {
     // 20% of the board is mines
     int totalMines = tiles.size() * 0.2;
+    std::stack <int> mineStack;
 
     std::vector<int> mineCandidateIndices;
 
     for (int i = 0; i < tiles.size(); ++i) {
-        if (i != playerSelectedIndex) {
+        if (i != playerSelectedIndex && tiles[i].tilestate == TileState::Hidden) {
             mineCandidateIndices.push_back(i);
         }
     }
@@ -70,19 +73,13 @@ void Board::PlaceMines(int playerSelectedIndex) {
         
         int index = mineCandidateIndices[i];
         tiles[index].isMine = true;
+        mineStack.push(index);
     }
 
-    CalculateDistances();
+    CalculateDistances(mineStack);
 }
 
-void Board::CalculateDistances() {
-    std::stack<int> mineStack;
-
-    for (int i = 0; i < tiles.size(); ++i) {
-        if (tiles[i].isMine) {
-            mineStack.push(i);
-        }
-    }
+void Board::CalculateDistances(std::stack<int>& mineStack) {
 
     while (!mineStack.empty()) {
         int mineIndex = mineStack.top();
@@ -99,26 +96,68 @@ void Board::CalculateDistances() {
                 int neighborIndex = neighborRow * size + neighborCol;
 
                 if (neighborRow >= 0 && neighborRow < size && neighborCol >= 0 && neighborCol < size) {
+                    if (!tiles[neighborIndex].isMine) {
                     tiles[neighborIndex].distanceFromMine++;
+                    }
                 }
             }
         }
     }
 }
 
-void Board::ExecuteMove(int playerSelectedIndex) {
+void Board::ExecuteMove(int& playerSelectedIndex) {
     
     if (tiles[playerSelectedIndex].tilestate == TileState::Hidden)
     {
-        tiles[playerSelectedIndex].tilestate = TileState::Revealed;
+        if (tiles[playerSelectedIndex].isMine)
+        {
+            destroyed = true;
+        }
+        else 
+        {
+            int mineRow = playerSelectedIndex / size;
+            int mineCol = playerSelectedIndex % size;
+            Reveal(mineRow, mineCol);
+        }
     }
     else
     {
         std::cout << "Invalid tile selected." << std::endl;
     }
+}
 
-    // for (int i = 0; i < tiles.size(); ++i)
-    // {
-    //     tiles[i].tilestate = TileState::Revealed;
-    // }
+void Board::Reveal(int row, int column) {
+    if (row < 0 || row >= size || column < 0 || column >= size)
+    {
+        return;
+    }
+
+    int index = row * size + column;
+    Tile& tile = tiles[index];
+
+    if (tile.tilestate == TileState::Revealed)
+    {
+        return;
+    }
+
+    tile.tilestate = TileState::Revealed;
+
+    if (tile.distanceFromMine == 0) {
+        for (int r = -1; r <= 1; ++r) {
+            for (int c = -1; c <= 1; ++c) {
+                if (r == 0 && c == 0) {
+                    continue;
+                }
+                Reveal(row + r, column + c);
+            }
+        }
+    }
+}
+
+void Board::FirstMove(int& playerSelectedIndex) {
+    if (tiles[playerSelectedIndex].tilestate == TileState::Hidden)
+    {
+        tiles[playerSelectedIndex].tilestate = TileState::Revealed;
+    }
+    PlaceMines(playerSelectedIndex);
 }

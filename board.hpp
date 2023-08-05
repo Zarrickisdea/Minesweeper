@@ -10,15 +10,22 @@
 class Board {
   public:
   Board (int dimension);
-  int GetSize();
-  void Display();
-  void CalculateDistances();
-  void PlaceMines(int playerSelectedIndex);
-  void ExecuteMove(int playerSelectedIndex);
+  int GetSize() const;
+  bool GetState() const;
+  void Display() const;
+  void CalculateDistances(std::stack<int>& mineStack);
+  void PlaceMines(int& playerSelectedIndex);
+  void ExecuteMove(int& playerSelectedIndex);
+  void FirstMove(int& playerSelectedIndex);
+  void Reveal(int row, int column);
 
   private:
-  std::vector<Tile> tiles;
   int size;
+  bool destroyed;
+
+  std::vector<Tile> tiles;
+
   std::mt19937 randomEngine;
-  void Separator();
+
+  void Separator() const;
 };

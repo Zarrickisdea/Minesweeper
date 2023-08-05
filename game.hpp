@@ -1,6 +1,7 @@
 #pragma once
 
 #include "board.hpp"
+#include <limits>
 
 class Game {
   public:

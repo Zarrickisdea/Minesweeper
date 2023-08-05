@@ -1,7 +1,7 @@
 #include "game.hpp"
 
 int main () {
-  Game game(9);
+  Game game(12);
 
   game.Start();
 }

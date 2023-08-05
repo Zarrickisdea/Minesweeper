@@ -11,5 +11,5 @@ class Tile {
   int distanceFromMine;
   bool isMine;
 
-  Tile() :  tilestate(TileState::Hidden), distanceFromMine(0), isMine(false) {}
+  Tile() : tilestate(TileState::Hidden), distanceFromMine(0), isMine(false) {}
 };
