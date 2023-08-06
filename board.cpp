@@ -54,26 +54,19 @@ void Board::Display() const {
 void Board::PlaceMines(int& playerSelectedIndex) {
     // 20% of the board is mines
     int totalMines = tiles.size() * 0.2;
-    std::stack <int> mineStack;
+    std::stack<int> mineStack;
 
-    std::vector<int> mineCandidateIndices;
+    // Generate random indices for mine placement
+    std::uniform_int_distribution<int> distribution(0, tiles.size() - 1);
+    std::set<int> chosenIndices;
 
-    for (int i = 0; i < tiles.size(); ++i) {
-        if (i != playerSelectedIndex && tiles[i].tilestate == TileState::Hidden) {
-            mineCandidateIndices.push_back(i);
+    while (chosenIndices.size() < totalMines) {
+        int randomIndex = distribution(randomEngine);
+        if (randomIndex != playerSelectedIndex && tiles[randomIndex].tilestate == TileState::Hidden) {
+            chosenIndices.insert(randomIndex);
+            mineStack.push(randomIndex);
+            tiles[randomIndex].isMine = true;
         }
-    }
-
-    std::shuffle(mineCandidateIndices.begin(), mineCandidateIndices.end(), randomEngine);
-
-    for (int i = 0; i < totalMines; ++i) {
-        if (i >= mineCandidateIndices.size()) {
-            break;
-        }
-        
-        int index = mineCandidateIndices[i];
-        tiles[index].isMine = true;
-        mineStack.push(index);
     }
 
     CalculateDistances(mineStack);

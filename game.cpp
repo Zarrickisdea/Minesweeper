@@ -7,11 +7,6 @@ void Game::Start() {
   int firstMove = GetMove();
 
   board.FirstMove(firstMove);
-  int row = firstMove / board.GetSize();
-  int column = firstMove % board.GetSize();
-  board.Reveal(row, column);
-
-  Update();
 }
 
 void Game::Update() {
