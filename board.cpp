@@ -8,19 +8,38 @@ int Board::GetSize() const { return size; }
 
 bool Board::GetState() const { return destroyed; }
 
+bool Board::CheckWin() const {
+    for (const Tile& tile: tiles) {
+        if (!tile.isMine && tile.tilestate == TileState::Hidden) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void Board::Separator() const
 {
-    std::cout << "+";
+    std::cout << std::setw(5) << "+" << std::setw(4 * size) << std::setfill('-') << "+" << std::setfill(' ') << std::endl;
+}
+
+void Board::PrintColumnNumbers() const {
+    std::cout << std::setw(3) << " ";
+
     for (int j = 0; j < size; ++j) {
-        std::cout << "---+";
+        std::cout << std::setw(4) << j + 1;
     }
     std::cout << std::endl;
 }
 
 void Board::Display() const {
+    std::cout << std::endl;
+    
+    PrintColumnNumbers();
     Separator();
 
     for (int i = 0; i < size; ++i) {
+        std::cout << std::setw(3) << i + 1 << " ";
+
         for (int j = 0; j < size; ++j) {
             int index = i * size + j;
             const Tile& tile = tiles[index];
@@ -41,7 +60,7 @@ void Board::Display() const {
             }
         }
 
-        std::cout << "|" << std::endl;
+        std::cout << "| " << std::setw(2) << i + 1 << " " << std::endl;
 
         if (i < size - 1) {
           Separator();
@@ -49,6 +68,7 @@ void Board::Display() const {
     }
 
     Separator();
+    PrintColumnNumbers();
 }
 
 void Board::PlaceMines(int& playerSelectedIndex) {

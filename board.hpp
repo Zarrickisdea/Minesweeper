@@ -7,6 +7,7 @@
 #include <iostream>
 #include <random>
 #include <algorithm>
+#include <iomanip>
 
 class Board {
   public:
@@ -14,6 +15,7 @@ class Board {
   int GetSize() const;
   bool GetState() const;
   void Display() const;
+  bool CheckWin() const;
   void ExecuteMove(int& playerSelectedIndex);
   void FirstMove(int& playerSelectedIndex);
 
@@ -26,6 +28,7 @@ class Board {
   std::mt19937 randomEngine;
 
   void Separator() const;
+  void PrintColumnNumbers() const;
   void CalculateDistances(std::stack<int>& mineStack);
   void PlaceMines(int& playerSelectedIndex);
   void Reveal(int row, int column);

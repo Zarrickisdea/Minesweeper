@@ -17,7 +17,15 @@ void Game::Update() {
     int move = GetMove();
 
     board.ExecuteMove(move);
-  } while (!board.GetState());
+  } while (!board.GetState() and !board.CheckWin());
+
+  if (board.CheckWin()) {
+    std::cout << "You won" << std::endl;
+  }
+  else
+  {
+    std::cout << "Hit a mine" << std::endl;
+  }
 }
 
 int Game::GetMove() {
