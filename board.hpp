@@ -16,12 +16,14 @@ class Board {
   bool GetState() const;
   void Display() const;
   bool CheckWin() const;
+  void RevealAllTiles();
   void ExecuteMove(int& playerSelectedIndex);
   void FirstMove(int& playerSelectedIndex);
 
   private:
   int size;
   bool destroyed;
+  int minecount;
 
   std::vector<Tile> tiles;
 

@@ -10,7 +10,11 @@
       "cppStandard": "${default}",
       "intelliSenseMode": "windows-gcc-x64",
       "compilerArgs": [
-        ""
+        "-fdiagnostics-color=always",
+        "-g",
+        "*.cpp",
+        "-o",
+        "${fileDirname}\\${fileBasenameNoExtension}.exe"
       ]
     }
   ],

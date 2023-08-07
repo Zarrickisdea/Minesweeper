@@ -1,8 +1,9 @@
 #include "game.hpp"
 
-Game::Game(int size) : board(size) {}
+Game::Game() : board(GetSize()) {}
 
 void Game::Start() {
+  std::cout << linebreak;
   board.Display();
   int firstMove = GetMove();
 
@@ -12,6 +13,7 @@ void Game::Start() {
 void Game::Update() {
   do
   {
+    std::cout << linebreak;
     board.Display();
 
     int move = GetMove();
@@ -20,21 +22,67 @@ void Game::Update() {
   } while (!board.GetState() and !board.CheckWin());
 
   if (board.CheckWin()) {
-    std::cout << "You won" << std::endl;
+    EndCard("You won");
   }
   else
   {
-    std::cout << "Hit a mine" << std::endl;
+    EndCard("Hit a mine");
   }
 }
 
-int Game::GetMove() {
+void Game::EndCard (std::string ending) {
+    board.RevealAllTiles();
+    std::cout << linebreak;
+    std::cout << ending << std::endl;
+    board.Display();
+    std::cout << linebreak;
+}
+
+int Game::GetSize() const {
+  Opening();
+  int size = ValidateSize();
+  return size;
+}
+
+void Game::Opening() const {
+  std::cout << heading;
+  std::cout << linebreak;
+  std::cout << rules;
+  std::cout << list;
+  std::cout << linebreak;
+}
+
+int Game::ValidateSize() const {
+  int temp = 0;
+
+  while (true) {
+    std::cout << std::endl;
+    std::cout << "Enter a size: " << std::endl;
+
+    if (std::cin >> temp) {
+      if (temp >= 9) {
+        break;
+      }
+      else {
+        std::cout << "Please enter a number greater than or equal to 9." << std::endl;
+      }
+    }
+    else {
+      std::cout << "Invalid input. Please enter a number." << std::endl;
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+  }
+  return temp;
+}
+
+int Game::GetMove() const {
   int x = 0;
   int y = 0;
 
   while (true) {
     std::cout << std::endl;
-    std::cout << "Enter your move (x y):" << std::endl;
+    std::cout << "Enter your move (row column):" << std::endl;
 
     if (std::cin >> x >> y) {
       if (x >= 1 && x <= board.GetSize() && y >= 1 && y <= board.GetSize()) {
@@ -52,3 +100,32 @@ int Game::GetMove() {
   int index = (x - 1) * board.GetSize() + (y - 1);
   return index;
 }
+
+std::string Game::heading = R"( __  __  ____  _  _  ____  ___  _    _  ____  ____  ____  ____  ____ 
+(  \/  )(_  _)( \( )( ___)/ __)( \/\/ )( ___)( ___)(  _ \( ___)(  _ \
+ )    (  _)(_  )  (  )__) \__ \ )    (  )__)  )__)  )___/ )__)  )   /
+(_/\/\_)(____)(_)\_)(____)(___/(__/\__)(____)(____)(__)  (____)(_)\_)
+)";
+
+std::string Game::rules = R"(██████  ██    ██ ██      ███████ ███████ 
+██   ██ ██    ██ ██      ██      ██      
+██████  ██    ██ ██      █████   ███████ 
+██   ██ ██    ██ ██      ██           ██ 
+██   ██  ██████  ███████ ███████ ███████
+
+)";
+
+std::string Game::linebreak = R"( 
+ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ 
+|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|
+
+)";
+
+std::string Game::list = R"(
+1. Please enter a number above or equal to 9 to create your own board.
+2. The board consists of randomly placed mines.
+3. Open every cell except mines to win.
+4. The game is over if you pick a mine.
+5. The cells have numbers on them, that show the number of mines around it.
+6. To make a move when prompted, type in the row and column number.
+)";

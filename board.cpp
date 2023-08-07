@@ -1,6 +1,6 @@
 #include "board.hpp"
 
-Board::Board(int dimension) : size(dimension), destroyed(false), randomEngine(std::random_device{}()) {
+Board::Board(int dimension) : size(dimension), destroyed(false), minecount(0), randomEngine(std::random_device{}()) {
     tiles.resize(dimension * dimension);
 }
 
@@ -9,7 +9,7 @@ int Board::GetSize() const { return size; }
 bool Board::GetState() const { return destroyed; }
 
 bool Board::CheckWin() const {
-    for (const Tile& tile: tiles) {
+    for (const Tile& tile : tiles) {
         if (!tile.isMine && tile.tilestate == TileState::Hidden) {
             return false;
         }
@@ -33,7 +33,7 @@ void Board::PrintColumnNumbers() const {
 
 void Board::Display() const {
     std::cout << std::endl;
-    
+
     PrintColumnNumbers();
     Separator();
 
@@ -71,6 +71,12 @@ void Board::Display() const {
     PrintColumnNumbers();
 }
 
+void Board::RevealAllTiles() {
+    for (Tile& tile : tiles) {
+        tile.tilestate = TileState::Revealed;
+    }
+}
+
 void Board::PlaceMines(int& playerSelectedIndex) {
     // 20% of the board is mines
     int totalMines = tiles.size() * 0.2;
@@ -86,37 +92,40 @@ void Board::PlaceMines(int& playerSelectedIndex) {
         
         tiles[index].isMine = true;
         mineStack.push(index);
+        minecount++;
     }
 
     CalculateDistances(mineStack);
 }
 
-
 void Board::CalculateDistances(std::stack<int>& mineStack) {
-
     while (!mineStack.empty()) {
         int mineIndex = mineStack.top();
         mineStack.pop();
 
-        int mineRow = mineIndex / size;
-        int mineCol = mineIndex % size;
+        int mineRow = mineIndex / size + 1;
+        int mineCol = mineIndex % size + 1;
 
         // Update distanceFromMine for neighboring tiles
         for (int r = -1; r <= 1; ++r) {
             for (int c = -1; c <= 1; ++c) {
                 int neighborRow = mineRow + r;
                 int neighborCol = mineCol + c;
-                int neighborIndex = neighborRow * size + neighborCol;
 
-                if (neighborRow >= 0 && neighborRow < size && neighborCol >= 0 && neighborCol < size) {
-                    if (!tiles[neighborIndex].isMine) {
-                    tiles[neighborIndex].distanceFromMine++;
+                if (neighborRow >= 1 && neighborRow <= size && neighborCol >= 1 && neighborCol <= size) {
+                    int neighborIndex = (neighborRow - 1) * size + (neighborCol - 1);
+
+                    if (neighborIndex != mineIndex) { // Check if neighborIndex is not the mineIndex
+                        if (!tiles[neighborIndex].isMine) {
+                            tiles[neighborIndex].distanceFromMine++;
+                        }
                     }
                 }
             }
         }
     }
 }
+
 
 void Board::ExecuteMove(int& playerSelectedIndex) {
     
@@ -128,8 +137,8 @@ void Board::ExecuteMove(int& playerSelectedIndex) {
         }
         else 
         {
-            int mineRow = playerSelectedIndex / size;
-            int mineCol = playerSelectedIndex % size;
+            int mineRow = (playerSelectedIndex / size) + 1;
+            int mineCol = (playerSelectedIndex % size) + 1;
             Reveal(mineRow, mineCol);
         }
     }
@@ -140,12 +149,12 @@ void Board::ExecuteMove(int& playerSelectedIndex) {
 }
 
 void Board::Reveal(int row, int column) {
-    if (row < 0 || row >= size || column < 0 || column >= size)
+    if (row < 1 || row > size || column < 1 || column > size)
     {
         return;
     }
 
-    int index = row * size + column;
+    int index = (row - 1) * size + (column - 1);
     Tile& tile = tiles[index];
 
     if (tile.tilestate == TileState::Revealed)
@@ -155,7 +164,7 @@ void Board::Reveal(int row, int column) {
 
     tile.tilestate = TileState::Revealed;
 
-    if (tile.distanceFromMine == 0) {
+    if (tile.distanceFromMine == 0 && !tile.isMine) {
         for (int r = -1; r <= 1; ++r) {
             for (int c = -1; c <= 1; ++c) {
                 if (r == 0 && c == 0) {
