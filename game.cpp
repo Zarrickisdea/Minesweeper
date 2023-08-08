@@ -59,7 +59,7 @@ int Game::ValidateSize() const {
     std::cout << std::endl;
     std::cout << "Enter a size: " << std::endl;
 
-    if (std::cin >> temp && temp >= 3) {
+    if (std::cin >> temp && temp >= 9) {
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       break;
     } else {

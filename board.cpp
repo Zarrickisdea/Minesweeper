@@ -71,7 +71,7 @@ void Board::Display() const {
     PrintColumnNumbers();
 }
 
-bool Board::IsValid (int row, int column) {
+bool Board::IsValid (int row, int column) const {
     return row >= 1 && row <= size && column >= 1 && column <= size; 
 }
 
@@ -85,14 +85,19 @@ void Board::PlaceMines(int& playerSelectedIndex) {
     // 20% of the board is mines
     int totalMines = tiles.size() * 0.2;
     std::stack<int> mineStack;
+    std::vector<int> tempIndices;
 
-    std::uniform_int_distribution<int> dist(0, tiles.size() - 1);
-
-    for (int i = 0; i < totalMines; ++i) {
-        int index = dist(randomEngine);
-        if (index == playerSelectedIndex) {
-            continue;
+    for (int i = 0; i < tiles.size(); ++i) {
+        if (i != playerSelectedIndex) {
+            tempIndices.push_back(i);
         }
+    }
+
+    std::shuffle(tempIndices.begin(), tempIndices.end(), randomEngine);
+
+    for (int i = 0; i < totalMines && !tempIndices.empty(); ++i) {
+        int index = tempIndices.back();
+        tempIndices.pop_back();
         
         tiles[index].isMine = true;
         mineStack.push(index);
