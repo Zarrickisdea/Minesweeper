@@ -71,6 +71,10 @@ void Board::Display() const {
     PrintColumnNumbers();
 }
 
+bool Board::IsValid (int row, int column) {
+    return row >= 1 && row <= size && column >= 1 && column <= size; 
+}
+
 void Board::RevealAllTiles() {
     for (Tile& tile : tiles) {
         tile.tilestate = TileState::Revealed;
@@ -112,13 +116,11 @@ void Board::CalculateDistances(std::stack<int>& mineStack) {
                 int neighborRow = mineRow + r;
                 int neighborCol = mineCol + c;
 
-                if (neighborRow >= 1 && neighborRow <= size && neighborCol >= 1 && neighborCol <= size) {
+                if (IsValid(neighborRow, neighborCol)) {
                     int neighborIndex = (neighborRow - 1) * size + (neighborCol - 1);
 
-                    if (neighborIndex != mineIndex) { // Check if neighborIndex is not the mineIndex
-                        if (!tiles[neighborIndex].isMine) {
-                            tiles[neighborIndex].distanceFromMine++;
-                        }
+                    if (neighborIndex != mineIndex && !tiles[neighborIndex].isMine) { // Check if neighborIndex is not the mineIndex
+                        tiles[neighborIndex].distanceFromMine++;
                     }
                 }
             }
@@ -149,7 +151,7 @@ void Board::ExecuteMove(int& playerSelectedIndex) {
 }
 
 void Board::Reveal(int row, int column) {
-    if (row < 1 || row > size || column < 1 || column > size)
+    if (!IsValid(row, column))
     {
         return;
     }

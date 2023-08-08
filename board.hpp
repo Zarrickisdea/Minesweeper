@@ -34,4 +34,5 @@ class Board {
   void CalculateDistances(std::stack<int>& mineStack);
   void PlaceMines(int& playerSelectedIndex);
   void Reveal(int row, int column);
+  bool IsValid(int row, int column);
 };

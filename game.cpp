@@ -59,33 +59,30 @@ int Game::ValidateSize() const {
     std::cout << std::endl;
     std::cout << "Enter a size: " << std::endl;
 
-    if (std::cin >> temp) {
-      if (temp >= 9) {
-        break;
-      }
-      else {
-        std::cout << "Please enter a number greater than or equal to 9." << std::endl;
-      }
-    }
-    else {
-      std::cout << "Invalid input. Please enter a number." << std::endl;
-      std::cin.clear();
+    if (std::cin >> temp && temp >= 3) {
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      break;
+    } else {
+      std::cout << "Invalid input. Please enter a number greater than or equal to 9." << std::endl;
+      std::cin.clear(); // Clear error state
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
+  
   return temp;
 }
 
 int Game::GetMove() const {
   int x = 0;
   int y = 0;
+  int s = board.GetSize();
 
   while (true) {
     std::cout << std::endl;
     std::cout << "Enter your move (row column):" << std::endl;
 
     if (std::cin >> x >> y) {
-      if (x >= 1 && x <= board.GetSize() && y >= 1 && y <= board.GetSize()) {
+      if (x >= 1 && x <= s && y >= 1 && y <= s) {
         break;
       } else {
         std::cout << "Invalid move. Please enter numbers within the board's dimensions." << std::endl;
@@ -97,7 +94,7 @@ int Game::GetMove() const {
     }
   }
 
-  int index = (x - 1) * board.GetSize() + (y - 1);
+  int index = (x - 1) * s + (y - 1);
   return index;
 }
 
