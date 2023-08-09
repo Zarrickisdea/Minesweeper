@@ -1,6 +1,6 @@
 #include "board.hpp"
 
-Board::Board(int dimension) : size(dimension), destroyed(false), minecount(0), randomEngine(std::random_device{}()) {
+Board::Board(int dimension) : size(dimension), destroyed(false), randomEngine(std::random_device{}()) {
     tiles.resize(dimension * dimension);
 }
 
@@ -19,11 +19,11 @@ bool Board::CheckWin() const {
 
 void Board::Separator() const
 {
-    std::cout << std::setw(5) << "+" << std::setw(4 * size) << std::setfill('-') << "+" << std::setfill(' ') << std::endl;
+    std::cout << std::setw(6) << "+" << std::setw(4 * size) << std::setfill('-') << "+" << std::setfill(' ') << std::endl;
 }
 
 void Board::PrintColumnNumbers() const {
-    std::cout << std::setw(3) << " ";
+    std::cout << std::setw(4) << " ";
 
     for (int j = 0; j < size; ++j) {
         std::cout << std::setw(4) << j + 1;
@@ -35,43 +35,40 @@ void Board::Display() const {
     std::cout << std::endl;
 
     PrintColumnNumbers();
-    Separator();
 
     for (int i = 0; i < size; ++i) {
+        Separator();
         std::cout << std::setw(3) << i + 1 << " ";
 
         for (int j = 0; j < size; ++j) {
             int index = i * size + j;
             const Tile& tile = tiles[index];
 
-            std::cout << "|";
+            std::cout << " | ";
+
             switch (tile.tilestate) {
                 case TileState::Hidden:
-                    std::cout << " . ";
+                    std::cout << ".";
                     break;
 
                 case TileState::Revealed:
                     if (tile.isMine) {
-                        std::cout << " M ";
+                        std::cout << "M";
                     } else {
-                        std::cout << " " << tile.distanceFromMine << " ";
+                        std::cout << tile.distanceFromMine;
                     }
                     break;
             }
         }
 
-        std::cout << "| " << std::setw(2) << i + 1 << " " << std::endl;
-
-        if (i < size - 1) {
-          Separator();
-        }
+        std::cout << " | " << std::setw(2) << i + 1 << " " << std::endl;
     }
 
     Separator();
     PrintColumnNumbers();
 }
 
-bool Board::IsValid (int row, int column) const {
+bool Board::IsValid (int& row, int& column) const {
     return row >= 1 && row <= size && column >= 1 && column <= size; 
 }
 
@@ -101,7 +98,6 @@ void Board::PlaceMines(int& playerSelectedIndex) {
         
         tiles[index].isMine = true;
         mineStack.push(index);
-        minecount++;
     }
 
     CalculateDistances(mineStack);
@@ -124,7 +120,7 @@ void Board::CalculateDistances(std::stack<int>& mineStack) {
                 if (IsValid(neighborRow, neighborCol)) {
                     int neighborIndex = (neighborRow - 1) * size + (neighborCol - 1);
 
-                    if (neighborIndex != mineIndex && !tiles[neighborIndex].isMine) { // Check if neighborIndex is not the mineIndex
+                    if (neighborIndex != mineIndex && !tiles[neighborIndex].isMine) {
                         tiles[neighborIndex].distanceFromMine++;
                     }
                 }

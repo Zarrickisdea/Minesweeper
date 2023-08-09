@@ -2,42 +2,6 @@
 
 Game::Game() : board(GetSize()) {}
 
-void Game::Start() {
-  std::cout << linebreak;
-  board.Display();
-  int firstMove = GetMove();
-
-  board.FirstMove(firstMove);
-}
-
-void Game::Update() {
-  do
-  {
-    std::cout << linebreak;
-    board.Display();
-
-    int move = GetMove();
-
-    board.ExecuteMove(move);
-  } while (!board.GetState() and !board.CheckWin());
-
-  if (board.CheckWin()) {
-    EndCard("You won");
-  }
-  else
-  {
-    EndCard("Hit a mine");
-  }
-}
-
-void Game::EndCard (std::string ending) {
-    board.RevealAllTiles();
-    std::cout << linebreak;
-    std::cout << ending << std::endl;
-    board.Display();
-    std::cout << linebreak;
-}
-
 int Game::GetSize() const {
   Opening();
   int size = ValidateSize();
@@ -98,13 +62,49 @@ int Game::GetMove() const {
   return index;
 }
 
-std::string Game::heading = R"( __  __  ____  _  _  ____  ___  _    _  ____  ____  ____  ____  ____ 
+void Game::Start() {
+  std::cout << linebreak;
+  board.Display();
+  int firstMove = GetMove();
+
+  board.FirstMove(firstMove);
+}
+
+void Game::Update() {
+  do
+  {
+    std::cout << linebreak;
+    board.Display();
+
+    int move = GetMove();
+
+    board.ExecuteMove(move);
+  } while (!board.GetState() and !board.CheckWin());
+
+  if (board.CheckWin()) {
+    EndCard(win);
+  }
+  else
+  {
+    EndCard(lose);
+  }
+}
+
+void Game::EndCard (const std::string& ending) {
+    board.RevealAllTiles();
+    std::cout << linebreak;
+    std::cout << ending << std::endl;
+    board.Display();
+    std::cout << linebreak;
+}
+
+const std::string Game::heading = R"( __  __  ____  _  _  ____  ___  _    _  ____  ____  ____  ____  ____ 
 (  \/  )(_  _)( \( )( ___)/ __)( \/\/ )( ___)( ___)(  _ \( ___)(  _ \
  )    (  _)(_  )  (  )__) \__ \ )    (  )__)  )__)  )___/ )__)  )   /
 (_/\/\_)(____)(_)\_)(____)(___/(__/\__)(____)(____)(__)  (____)(_)\_)
 )";
 
-std::string Game::rules = R"(██████  ██    ██ ██      ███████ ███████ 
+const std::string Game::rules = R"(██████  ██    ██ ██      ███████ ███████ 
 ██   ██ ██    ██ ██      ██      ██      
 ██████  ██    ██ ██      █████   ███████ 
 ██   ██ ██    ██ ██      ██           ██ 
@@ -112,17 +112,32 @@ std::string Game::rules = R"(██████  ██    ██ ██      �
 
 )";
 
-std::string Game::linebreak = R"( 
+const std::string Game::linebreak = R"( 
  _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ 
 |_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|
 
 )";
 
-std::string Game::list = R"(
+const std::string Game::list = R"(
 1. Please enter a number above or equal to 9 to create your own board.
 2. The board consists of randomly placed mines.
-3. Open every cell except mines to win.
+3. Open every unmined tile to win.
 4. The game is over if you pick a mine.
-5. The cells have numbers on them, that show the number of mines around it.
+5. The tiles have numbers that show the number of mines around it.
 6. To make a move when prompted, type in the row and column number.
+)";
+
+const std::string Game::lose = R"(
+
+█▄█ █▀█ █ █   █ █ █ ▀█▀   ▄▀█   █▀▄▀█ █ █▄ █ █▀▀          
+ █  █▄█ █▄█   █▀█ █  █    █▀█   █ ▀ █ █ █ ▀█ ██▄ ▄ ▄ ▄ ▄ ▄
+
+)";
+
+const std::string Game::win = R"(
+█▀▀ █▀█ █▄ █ █▀▀ █▀█ ▄▀█ ▀█▀ █ █ █   ▄▀█ ▀█▀ █ █▀█ █▄ █ █▀ █ █ █
+█▄▄ █▄█ █ ▀█ █▄█ █▀▄ █▀█  █  █▄█ █▄▄ █▀█  █  █ █▄█ █ ▀█ ▄█ ▄ ▄ ▄
+
+█▄█ █▀█ █ █   █ █ █ █▀█ █▄ █ █ █ █
+ █  █▄█ █▄█   ▀▄▀▄▀ █▄█ █ ▀█ ▄ ▄ ▄
 )";

@@ -23,7 +23,6 @@ class Board {
   private:
   int size;
   bool destroyed;
-  int minecount;
 
   std::vector<Tile> tiles;
 
@@ -31,8 +30,8 @@ class Board {
 
   void Separator() const;
   void PrintColumnNumbers() const;
+  bool IsValid(int& row, int& column) const;
   void CalculateDistances(std::stack<int>& mineStack);
   void PlaceMines(int& playerSelectedIndex);
   void Reveal(int row, int column);
-  bool IsValid(int row, int column) const;
 };

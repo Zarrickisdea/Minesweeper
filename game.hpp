@@ -11,14 +11,16 @@ class Game {
 
   private:
   Board board;
-  static std::string heading;
-  static std::string rules;
-  static std::string linebreak;
-  static std::string list;
+  static const std::string heading;
+  static const std::string rules;
+  static const std::string linebreak;
+  static const std::string list;
+  static const std::string lose;
+  static const std::string win;
 
   int GetMove() const;
   int GetSize() const;
   int ValidateSize() const;
   void Opening() const;
-  void EndCard(std::string ending);
+  void EndCard(const std::string& ending);
 };
