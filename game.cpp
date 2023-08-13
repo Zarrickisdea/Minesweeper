@@ -62,6 +62,15 @@ int Game::GetMove() const {
   return index;
 }
 
+void Game::ExitPrompt() const {
+  std::cout << "Press Enter to exit." << std::endl;
+
+  std::cin.clear();
+  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+  std::cin.get();
+}
+
 void Game::Start() {
   std::cout << linebreak;
   board.Display();
@@ -88,6 +97,7 @@ void Game::Update() {
   {
     EndCard(lose);
   }
+  ExitPrompt();
 }
 
 void Game::EndCard (const std::string& ending) {

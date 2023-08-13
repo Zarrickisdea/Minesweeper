@@ -22,5 +22,6 @@ class Game {
   int GetSize() const;
   int ValidateSize() const;
   void Opening() const;
+  void ExitPrompt() const;
   void EndCard(const std::string& ending);
 };
